@@ -17,10 +17,18 @@ export default {
         }
     }
   },
-  methods(){
-    // logicNot(){
-
-    // }
+  methods:{
+    login(){
+      // 通过 refs 判断表单是否有值，如果有则进入下一步操作
+      this.$refs.userForm.validate(valid=>{
+        if(valid){
+          this.$api.login(this.user).then(res=>{
+            this.$store.commit('saveUserInfo',res)
+            this.$router.push('/welcome')
+          })
+        }
+      })
+    }
   }
 };
 </script>
@@ -28,7 +36,8 @@ export default {
 <template>
   <div class="login-wrapper">
     <div class="model">
-        <el-form :model="user" status-icon :rules="rules">
+        <!-- ref vue 操作原生DOM 句柄   -->
+        <el-form :model="user" status-icon :rules="rules" ref="userForm">
           <div class="title">火星</div>
           <el-form-item prop="userName">
             <el-input type="text" placeholder="请输入账号" prefix-icon="avatar" v-model="user.userName" />

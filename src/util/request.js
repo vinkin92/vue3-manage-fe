@@ -25,7 +25,7 @@
  
  // 响应拦截
  service.interceptors.response.use((res) => {
-   const { code, data, msg } = req.data;
+   const { code, data, msg } = res.data;
    if (code === 200) {
      return data;
    } else if (code === 40001) {
@@ -51,7 +51,9 @@
    if (options.method.toLowerCase() === "get") {
      options.params = options.data;
    }
- 
+   if(typeof options.mock != 'undefined'){
+    config.mock = options.mock
+   }
    if (config.env === "prod") {
      service.defaults.baseURL = config.baseURL;
    } else {
