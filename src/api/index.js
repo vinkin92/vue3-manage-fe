@@ -7,7 +7,8 @@
          return request({
              url: '/users/login',
              method: 'post',
-             data: params
+             data: params,
+             mock:false
          })
      },
      noticeCount(params) {

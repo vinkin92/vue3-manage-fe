@@ -7,7 +7,6 @@
  import router from "./../router";
  const TOKEN_INVALID = "Tonken 认证失败";
  const NETWORK_ERROR = "网络请求异常，请稍后重试";
- console.log("baseURL===>", config.baseURL);
  // 创建 axios 实例对象，添加全局配置
  const service = axios.create({
    baseURL: config.baseURL,
@@ -16,8 +15,6 @@
  
  // 请求拦截
  service.interceptors.request.use((req) => {
-   console.log("baseURL===>", config.baseURL);
-   console.log("11111", service.defaults.baseURL);
    const headers = req.headers;
    if (!headers.Authorization) headers.Authorization = "Bear Jack";
    return req;
@@ -28,7 +25,7 @@
    const { code, data, msg } = res.data;
    if (code === 200) {
      return data;
-   } else if (code === 40001) {
+   } else if (code === 50001) {
      ElMessage.error(TOKEN_INVALID);
      setTimeout(() => {
        router.push("/login");
