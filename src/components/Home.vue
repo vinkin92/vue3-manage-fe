@@ -3,12 +3,13 @@ export default {
   name: "Home",
   data(){
     return{
-      userInfo:{
-        userName:'jack',
-        userEmail:'111@qq.com'
-      },
-      isCollapse:false
+      userInfo:this.$store.state.userInfo,
+      isCollapse:false,
+      noticeCount:0
     }
+  },
+  mounted(){
+    this.getNoticeCount()
   },
   methods:{
     handleLogout(key){
@@ -18,7 +19,16 @@ export default {
       this.$router.push('/login');
     },
     toggle(){
-      this.isCollapse = !this.isCollapse
+      this.isCollapse = !this.isCollapse;
+    },
+    async getNoticeCount(){
+      try {
+        // 获取用户待处理信息的数量值
+        const count = await this.$api.noticeCount();
+        this.noticeCount = count;
+      } catch (error) {
+        console.log(error)
+      }
     }
   }
 };
@@ -62,7 +72,7 @@ export default {
         </div>
 
         <div class="userInfo">
-          <el-badge :is-dot="true" class="notice">
+          <el-badge :is-dot="noticeCount" class="notice">
             <el-icon><BellFilled /></el-icon>
           </el-badge>
           <el-dropdown @command="handleLogout">
