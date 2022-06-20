@@ -16,6 +16,9 @@ export default {
       this.$store.commit('saveUserInfo','');
       this.userInfo = null;
       this.$router.push('/login');
+    },
+    toggle(){
+      this.isCollapse = !this.isCollapse
     }
   }
 };
@@ -24,11 +27,11 @@ export default {
 <template>
   <div class="basic-layout">
     <!-- 左侧区域 -->
-    <div class="nav-side">
+    <div :class="['nav-side',isCollapse?'flod':'unfold']">
       <!-- logo -->
       <div class="logo">
         <img src="./../assets/logo.png">
-        <span>Manager</span>
+        <span :style="{'display':isCollapse?'none':'inline'}">Manager</span>
       </div>
       <!-- 导航菜单 -->
       <el-menu default-active="2" background-color="#001529" text-color="#fff" router :collapse="isCollapse" class="nav-menu">
@@ -51,10 +54,10 @@ export default {
       </el-menu>
     </div>
     <!-- 右侧区域 -->
-    <div class="content-right">
+    <div :class="['content-right',isCollapse?'fold':'unfold']">
       <div class="nav-top">
         <div class="nav-left">
-          <el-icon class="menu-fold" ><Fold /></el-icon>
+          <el-icon class="menu-fold" @click="toggle"><Fold /></el-icon>
           <div class="bread">面包屑</div>
         </div>
 
@@ -88,7 +91,6 @@ export default {
   position: relative;
   .nav-side{
     position:fixed;
-    width:200px;
     height:100vh;
     background-color: #001529;
     color:#fff;
@@ -109,9 +111,25 @@ export default {
       height:calc(100vh - 50px );
       border-right: none;
     }
+    // 合并
+    &.fold{
+      width:64px;
+    }
+    // 展开
+    &.unfold{
+      width:200px;
+    }
   }
   .content-right{
     margin-left: 200px;
+    // 合并
+    &.fold{
+      margin-left:64px;
+    }
+    // 展开
+    &.unfold{
+      margin-left:200px;
+    }
     .nav-top{
       height: 50px;
       line-height: 50px;
