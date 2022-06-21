@@ -31,7 +31,8 @@
          return request({
              url: '/users/list',
              method: 'get',
-             data: params
+             data: params,
+             mack:true
          })
      },
      userDel(params) {

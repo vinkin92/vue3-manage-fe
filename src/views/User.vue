@@ -1,33 +1,16 @@
 <script>
-import {onMounted,reactive,ref} from 'vue'
+import {onMounted,reactive,ref,getCurrentInstance} from 'vue'
 export default {
     name: "User",
     setup(){
-        const user = reactive({});
-        const userList = ref([
-            {
-                "state": 1,
-                "role": "0",
-                "roleList": [
-                    "60180b07b1eaed6c45fbebdb",
-                    "60150cb764de99631b2c3cd3",
-                    "60180b59b1eaed6c45fbebdc"
-                ],
-                "deptId": [
-                    "60167059c9027b7f2c520a61",
-                    "60167345c6a4417f2d27506f"
-                ],
-                "userId": 1000002,
-                "userName": "admin",
-                "userPwd": "admin",
-                "userEmail": "admin@imooc.com",
-                "createTime": "2021-01-17T13:32:06.381Z",
-                "lastLoginTime": "2021-01-17T13:32:06.381Z",
-                "__v": 0,
-                "job": "前端架构师",
-                "mobile": "17611020000"
-            }
-        ]);
+        const {ctx} = getCurrentInstance()
+        // 获取composition api 挂在全局对象中的 api
+        const  globalProperties = getCurrentInstance().appContext.config.globalProperties;
+        // 初始化用户表单对象
+        const user = reactive({state:0});
+        // 初始化用户列表数据
+        const userList = ref([]);
+        // 定义表格表头数据
         const column = reactive([
             {label:'用户id',prop:"userId"},
             {label:'用户名',prop:"userName"},
@@ -37,10 +20,39 @@ export default {
             {label:'注册时间',prop:"createTime"},
             {label:'最后登录时间',prop:"lastLoginTime"},
         ]);
-        onMounted(()=>{
-            console.log('init')
+        const pager = reactive({
+            pageNum:1,
+            pageSize:10
         })
-        return {user,userList,column}
+        const formRef = ref()
+        onMounted(()=>{
+            getUserList()
+        })
+        const getUserList = async ()=>{
+            let params = {...user,...pager};
+            try {
+                const {list,page} = await globalProperties.$api.getUserList(params);
+                userList.value = list;
+                pager.total = page.total;
+            } catch (error) {
+                console.log(error)
+            }
+        }
+        // 查询 
+        const handleQuery = ()=>{
+            getUserList()
+        }
+        // 重置
+        const handleReset = (formEl)=>{
+            if(!formEl)return;
+            formEl.resetFields() 
+        }
+        //分页时间处理
+        const handleCurrentChange = (val)=>{
+            pager.pageNum = val;
+            getUserList()
+        }
+        return {user,userList,column,getUserList,pager,handleQuery,handleReset,formRef,handleCurrentChange}
     }
 };
 </script>
@@ -48,14 +60,14 @@ export default {
 <template>
   <div class="user-manager">
     <div class="query-form">
-        <el-form :inline="true" :model="user">
-            <el-form-item>
+        <el-form :inline="true" :model="user" ref="formRef">
+            <el-form-item label="用户ID" prop="userId">
                 <el-input v-model="user.userId" placeholder="请输入用户ID"/>
             </el-form-item>            
-            <el-form-item>
+            <el-form-item label="用户名称" prop="userName">
                 <el-input v-model="user.userName" placeholder="请输入用户名称"/>
             </el-form-item>
-            <el-form-item>
+            <el-form-item label="用户状态" prop="state">
                 <el-select v-model="user.state">
                     <el-option :value="0" label="所有"></el-option>
                     <el-option :value="1" label="在职"></el-option>
@@ -64,8 +76,8 @@ export default {
                 </el-select>
             </el-form-item>
             <el-form-item>
-                <el-button tyoe="primary">查询</el-button>
-                <el-button>重置</el-button>
+                <el-button tyoe="primary" @click="handleQuery">查询</el-button>
+                <el-button @click="handleReset(formRef)">重置</el-button>
             </el-form-item>
         </el-form>
     </div>
@@ -84,6 +96,7 @@ export default {
                 </template>  
             </el-table-column>
         </el-table>
+        <el-pagination background layout="prev, pager, next" :total="pager.total" class="pagination" :page-seze="pager.pageSize" @current-change="handleCurrentChange"/>
     </div>
   </div>
 </template>
