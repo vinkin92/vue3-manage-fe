@@ -22,10 +22,7 @@
                     return []
                 }
             }
-        },
-        mounted(){
-          console.log(this.userMenu)
-        },
+        }
     }
 </script>
 <style lang="scss">
