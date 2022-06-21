@@ -24,7 +24,7 @@
              url: '/menu/list',
              method: 'get',
              data: params,
-             mock: false
+             mock: true
          })
      },
      getUserList(params) {

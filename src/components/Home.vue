@@ -1,15 +1,20 @@
 <script>
+import TreeMenu from './TreeMenu.vue'
 export default {
   name: "Home",
+  components:{TreeMenu},
   data(){
     return{
       userInfo:this.$store.state.userInfo,
       isCollapse:false,
-      noticeCount:0
+      noticeCount:0,
+      userMenu:[],
+      activeMenu:location.hash.slice(1),
     }
   },
   mounted(){
     this.getNoticeCount()
+    this.getMenuList()
   },
   methods:{
     handleLogout(key){
@@ -29,6 +34,15 @@ export default {
       } catch (error) {
         console.log(error)
       }
+    },
+    // 获取左侧导航栏列表
+    async getMenuList(){
+      try {
+        const list = await this.$api.getMenuList()
+        this.userMenu = list
+      } catch (error) {
+        console.log(error)
+      }
     }
   }
 };
@@ -44,23 +58,8 @@ export default {
         <span :style="{'display':isCollapse?'none':'inline'}">Manager</span>
       </div>
       <!-- 导航菜单 -->
-      <el-menu default-active="2" background-color="#001529" text-color="#fff" router :collapse="isCollapse" class="nav-menu">
-        <el-sub-menu index="1">
-          <template #title>
-            <el-icon><location /></el-icon>
-            <span>系统管理</span>
-          </template>
-          <el-menu-item index="1-1">用户管理</el-menu-item>
-          <el-menu-item index="1-2">菜单管理</el-menu-item>
-        </el-sub-menu>
-        <el-sub-menu index="2">
-          <template #title>
-            <el-icon><location /></el-icon>
-            <span>审批管理</span>
-          </template>
-          <el-menu-item index="2-1">休假申请</el-menu-item>
-          <el-menu-item index="2-2">待我审批</el-menu-item>
-        </el-sub-menu>
+      <el-menu :default-active="activeMenu" background-color="#001529" text-color="#fff" router :collapse="isCollapse" class="nav-menu">
+        <TreeMenu :userMenu="userMenu"/>
       </el-menu>
     </div>
     <!-- 右侧区域 -->
@@ -72,7 +71,7 @@ export default {
         </div>
 
         <div class="userInfo">
-          <el-badge :is-dot="noticeCount" class="notice">
+          <el-badge :is-dot="noticeCount>0?true:false" class="notice">
             <el-icon><BellFilled /></el-icon>
           </el-badge>
           <el-dropdown @command="handleLogout">
