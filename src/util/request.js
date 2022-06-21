@@ -5,6 +5,7 @@
  import config from "./../config";
  import { ElMessage } from "element-plus";
  import router from "./../router";
+ import storage from './storage.js'
  const TOKEN_INVALID = "Tonken 认证失败";
  const NETWORK_ERROR = "网络请求异常，请稍后重试";
  // 创建 axios 实例对象，添加全局配置
@@ -16,7 +17,9 @@
  // 请求拦截
  service.interceptors.request.use((req) => {
    const headers = req.headers;
-   if (!headers.Authorization) headers.Authorization = "Bear Jack";
+   // 从本地存储中获取token值，然后后续所有的请求都会带 token 请求
+   const {token} = storage.getItem('userInfo');
+   if (!headers.Authorization) headers.Authorization = "Bear " + token;
    return req;
  });
  
