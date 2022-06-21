@@ -1,8 +1,9 @@
 <script>
 import TreeMenu from './TreeMenu.vue'
+import BreadCrumb from './BreadCrumb.vue'
 export default {
   name: "Home",
-  components:{TreeMenu},
+  components:{TreeMenu,BreadCrumb},
   data(){
     return{
       userInfo:this.$store.state.userInfo,
@@ -67,7 +68,7 @@ export default {
       <div class="nav-top">
         <div class="nav-left">
           <el-icon class="menu-fold" @click="toggle"><Fold /></el-icon>
-          <div class="bread">面包屑</div>
+          <div class="bread"><BreadCrumb /> </div>
         </div>
 
         <div class="userInfo">
