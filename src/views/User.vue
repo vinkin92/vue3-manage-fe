@@ -24,6 +24,8 @@ export default {
             pageNum:1,
             pageSize:10
         })
+        //选中用户列表的对象
+        const checkdUserIds = ref([])
         const formRef = ref()
         onMounted(()=>{
             getUserList()
@@ -52,7 +54,32 @@ export default {
             pager.pageNum = val;
             getUserList()
         }
-        return {user,userList,column,getUserList,pager,handleQuery,handleReset,formRef,handleCurrentChange}
+        // 用户单个删除
+        const handleDel = async (row)=>{
+            await globalProperties.$api.userDel({userIds:[row.userId]})
+            globalProperties.$message.success('删除成功')
+            getUserList()
+        }
+        // 用户批量删除
+        const handlePatchDel = async ()=>{
+            if(checkdUserIds.value.length == 0) globalProperties.$message.error('请选择要删除的用户')
+            const res = await globalProperties.$api.userDel({userIds:checkdUserIds.value})
+            if(res.nModified > 0){
+                globalProperties.$message.success('删除成功')
+                getUserList()
+            }else{
+                globalProperties.$message.error('删除失败') 
+            }
+        }
+        // 表格多选
+        const handleSelectionChange = (val) => {
+            let arr = [];
+            val.map((v)=>arr.push(v.userId));
+            checkdUserIds.value = arr;
+        }
+        return {user,userList,column,getUserList,pager,handleQuery,handleReset,formRef,handleCurrentChange,handleDel,checkdUserIds,handlePatchDel,
+            handleSelectionChange
+        }
     }
 };
 </script>
@@ -84,19 +111,19 @@ export default {
     <div class="base-table">
         <div class="action">
             <el-button type="primary">新增</el-button>
-            <el-button type="danger">批量删除</el-button>
+            <el-button type="danger" @click="handlePatchDel">批量删除</el-button>
         </div>
-        <el-table :data="userList" >
+        <el-table :data="userList" @selection-change="handleSelectionChange">
             <el-table-column type="selection" width="55"/>
             <el-table-column v-for="item in column" :key="item.prop" :prop="item.prop" :label="item.label" />
             <el-table-column>
-                <template #default>
+                <template #default="scope">
                     <el-button type="primary" size="small">编辑</el-button>
-                    <el-button type="danger" size="small">删除</el-button>
+                    <el-button type="danger" size="small" @click="handleDel(scope.row)">删除</el-button>
                 </template>  
             </el-table-column>
         </el-table>
-        <el-pagination background layout="prev, pager, next" :total="pager.total" class="pagination" :page-seze="pager.pageSize" @current-change="handleCurrentChange"/>
+        <el-pagination background layout="prev, pager, next" :total="pager.total" class="pagination" :page-size="pager.pageSize" @current-change="handleCurrentChange"/>
     </div>
   </div>
 </template>
