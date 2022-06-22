@@ -15,8 +15,23 @@ export default {
             {label:'用户id',prop:"userId"},
             {label:'用户名',prop:"userName"},
             {label:'用户邮箱',prop:"userEmail"},
-            {label:'用户角色',prop:"role"},
-            {label:'用户状态',prop:"state"},
+            {label:'用户角色',prop:"role",
+                formatter(row,column,value){
+                    return{
+                        0:'管理员',
+                        1:'普通用户'
+                    }[value]
+                }
+            },
+            {label:'用户状态',prop:"state",
+                formatter(row,column,value){
+                    return{
+                        1:'在职',
+                        2:'普离职',
+                        3:'试用期'
+                    }[value]
+                }
+            },
             {label:'注册时间',prop:"createTime"},
             {label:'最后登录时间',prop:"lastLoginTime"},
         ]);
@@ -115,7 +130,7 @@ export default {
         </div>
         <el-table :data="userList" @selection-change="handleSelectionChange">
             <el-table-column type="selection" width="55"/>
-            <el-table-column v-for="item in column" :key="item.prop" :prop="item.prop" :label="item.label" />
+            <el-table-column v-for="item in column" :key="item.prop" :prop="item.prop" :label="item.label" :formatter="item.formatter"/>
             <el-table-column>
                 <template #default="scope">
                     <el-button type="primary" size="small">编辑</el-button>

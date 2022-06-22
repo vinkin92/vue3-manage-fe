@@ -39,7 +39,8 @@
          return request({
              url: '/users/delete',
              method: 'post',
-             data: params
+             data: params,
+             mock:true
          })
      },
      getRoleList() {
