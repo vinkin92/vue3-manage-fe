@@ -81,7 +81,6 @@ export default {
         }
         // 重置
         const handleReset = (formEl)=>{
-            console.log(formEl)
             if(!formEl)return;
             formEl.resetFields() 
         }
@@ -149,8 +148,18 @@ export default {
             })
             
         }
+        // 编辑用户信息
+        const handleEdit = (row)=>{
+            action.value = 'edit';
+            dialogVisible.value = true;
+            // 等 DOM 渲染完成以后再执行代码，即弹窗后复制 row 到 userForm 上面
+            ctx.$nextTick(()=>{
+                Object.assign(userForm,row);
+            })
+        }
         return {user,userList,column,getUserList,pager,handleQuery,handleReset,formRef,handleCurrentChange,handleDel,checkdUserIds,handlePatchDel,
-            handleSelectionChange,dialogVisible,userForm,rules,getDeptList,getRoleList,roleList,deptList,handleClose,handleSubmit,DialogForm
+            handleSelectionChange,dialogVisible,userForm,rules,getDeptList,getRoleList,roleList,deptList,handleClose,handleSubmit,DialogForm,
+            handleEdit,action
         }
     }
 };
@@ -183,7 +192,7 @@ export default {
     <!--  用户列表 -->
     <div class="base-table">
         <div class="action">
-            <el-button type="primary" @click="dialogVisible = true">新增</el-button>
+            <el-button type="primary" @click="action = 'add';dialogVisible = true">新增</el-button>
             <el-button type="danger" @click="handlePatchDel">批量删除</el-button>
         </div>
         <el-table :data="userList" @selection-change="handleSelectionChange">
@@ -191,7 +200,8 @@ export default {
             <el-table-column v-for="item in column" :key="item.prop" :prop="item.prop" :label="item.label" :formatter="item.formatter"/>
             <el-table-column>
                 <template #default="scope">
-                    <el-button type="primary" size="small">编辑</el-button>
+                    <!-- scope.row 可以拿到该行的信息 -->
+                    <el-button type="primary" size="small" @click="handleEdit(scope.row)">编辑</el-button>
                     <el-button type="danger" size="small" @click="handleDel(scope.row)">删除</el-button>
                 </template>  
             </el-table-column>
@@ -202,10 +212,10 @@ export default {
     <el-dialog v-model="dialogVisible" title="用户新增">
         <el-form :model="userForm" label-width="80px" ref="DialogForm" :rules="rules">
             <el-form-item label="用户名" prop="userName">
-                <el-input v-model="userForm.userName" placeholder="请输入用户名称"/>
+                <el-input v-model="userForm.userName" placeholder="请输入用户名称" :disabled="action == 'edit'"/>
             </el-form-item>
             <el-form-item label="邮箱" prop="userEmail">
-                <el-input v-model="userForm.userEmail" placeholder="请输入用户邮箱">
+                <el-input v-model="userForm.userEmail" :disabled="action == 'edit'" placeholder="请输入用户邮箱">
                     <template #append>
                         @imooc.com
                     </template>
