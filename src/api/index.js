@@ -64,7 +64,7 @@
              url: '/users/operate',
              method: 'post',
              data: params,
-             mock: false
+             mock: true
          })
      },
      menuSubmit(params) {

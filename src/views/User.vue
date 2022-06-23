@@ -1,5 +1,5 @@
 <script>
-import {onMounted,reactive,ref,getCurrentInstance} from 'vue'
+import {onMounted,reactive,ref,getCurrentInstance,toRaw} from 'vue'
 export default {
     name: "User",
     setup(){
@@ -42,6 +42,7 @@ export default {
         //选中用户列表的对象
         const checkdUserIds = ref([])
         const formRef = ref()
+        const DialogForm = ref()
         // 是否显示弹窗添加新用户
         const dialogVisible = ref(false)
         // 新增用户Form 对象
@@ -50,11 +51,19 @@ export default {
         const rules = reactive({
             userName:[{required:true,message:"请输入用户名称",trigger:'blur'}],
             userEmail:[{required:true,message:"请输入邮箱",trigger:'blur'}],
-            mobile:[{required:true,message:"请输入邮箱",trigger:'blur'},{pattern:/1\d{10}/,message:'请输入正确的手机号',trigger:'blur'},{type:'number',message:'输入类型必须为数字',trigger:'blur'}],
-            deptId:[{required:true,message:"请输入邮箱",trigger:'blur'}]
+            mobile:[{pattern:/1\d{10}/,message:'请输入正确的手机号',trigger:'blur'}],
+            deptId:[{required:true,message:"请输入所属部门",trigger:'blur'}]
         });
+        // 角色列表
+        const roleList = ref([])
+        // 部门列表
+        const deptList = ref([])
+        // 定义用户操作的行为
+        const action = ref('add')
         onMounted(()=>{
-            getUserList()
+            getUserList();
+            getDeptList();
+            getRoleList();
         })
         const getUserList = async ()=>{
             let params = {...user,...pager};
@@ -72,6 +81,7 @@ export default {
         }
         // 重置
         const handleReset = (formEl)=>{
+            console.log(formEl)
             if(!formEl)return;
             formEl.resetFields() 
         }
@@ -103,8 +113,44 @@ export default {
             val.map((v)=>arr.push(v.userId));
             checkdUserIds.value = arr;
         }
+        // 获取部门列表
+        const getDeptList=async ()=>{
+            let list = await globalProperties.$api.getDeptList();
+            deptList.value = list
+        }
+        // 获取角色列表
+        const getRoleList=async ()=>{
+            let list = await globalProperties.$api.getRoleList()
+            roleList.value = list
+        }
+        // 弹窗关闭
+        const handleClose = (value)=>{
+            dialogVisible.value = false;
+            handleReset(value)
+        }
+        // 新增用户提交
+        const handleSubmit = ()=>{
+            // 先校验必填项是否填写
+            ctx.$refs.DialogForm.validate( async (valid)=>{
+                if(valid){
+                    //toRaw 把响应式对象转换成普通对象，否则后面修改则会自动修改表单的内容
+                    let params = toRaw(userForm);
+                    params.userEmail += "@imooc.com";
+                    let res = await globalProperties.$api.userSubmit(params)
+                    console.log('res',res)
+                    if(res){
+                        dialogVisible.value = false;
+                        ctx.$message.success('用户创建成功');
+                        handleReset('dialogForm');
+                        getUserList();
+                    }
+                    
+                }
+            })
+            
+        }
         return {user,userList,column,getUserList,pager,handleQuery,handleReset,formRef,handleCurrentChange,handleDel,checkdUserIds,handlePatchDel,
-            handleSelectionChange,dialogVisible,userForm,rules
+            handleSelectionChange,dialogVisible,userForm,rules,getDeptList,getRoleList,roleList,deptList,handleClose,handleSubmit,DialogForm
         }
     }
 };
@@ -179,19 +225,19 @@ export default {
                 </el-select>
             </el-form-item>
             <el-form-item label="系统角色" prop="roleList">
-                <el-select v-model="userForm.roleList" placeholder="请选择用户系统角色">
-                    <el-option></el-option>
+                <el-select v-model="userForm.roleList" placeholder="请选择用户系统角色" multiple style="width:100%">
+                    <el-option v-for="role in roleList" :key="role._id" :label="role.roleName" :value="role._id"></el-option>
                 </el-select>
             </el-form-item>
             <el-form-item label="部门" prop="deptId">
                 <!-- 显示的值为label ，提交的值为value ,服务器返回的是_id和deptName,所以使用组件自带的转换工具把 _id替换成value,deptName自动替换成label -->
-                <el-cascader v-model="userForm.deptId" :options="options" :props="{checkStrictly:true,value:'_id',label:'deptName'}" clearable placeholder="请选择所属部门" />
+                <el-cascader v-model="userForm.deptId" :options="deptList" :props="{checkStrictly:true,value:'_id',label:'deptName'}" clearable placeholder="请选择所属部门" style="width:100%"/>
             </el-form-item>
         </el-form>
         <template #footer>
             <span class="dialog-footer">
-                <el-button @click="dialogVisible = false">取消</el-button>
-                <el-button type="primary" @click="dialogVisible = false">确定</el-button>
+                <el-button @click="handleClose(DialogForm)">取消</el-button>
+                <el-button type="primary" @click="handleSubmit ">确定</el-button>
             </span>
         </template>
     </el-dialog>
