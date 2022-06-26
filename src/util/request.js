@@ -46,19 +46,20 @@
   *
   * @param {*} option 请求配置
   * @returns
-  */
+  */ 
  function request(options) {
    options.method = options.method || "get";
    if (options.method.toLowerCase() === "get") {
      options.params = options.data;
    }
+   let isMock = config.mock
    if(typeof options.mock != undefined){
-    config.mock = options.mock
+    isMock = options.mock
    }
    if (config.env === "prod") {
      service.defaults.baseURL = config.baseURL;
    } else {
-     service.defaults.baseURL = config.mock ? config.mockApi : config.baseApi;
+     service.defaults.baseURL = isMock ? config.mockApi : config.baseApi;
    }
    return service(options);
  }
