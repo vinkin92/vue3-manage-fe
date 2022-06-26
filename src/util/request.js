@@ -19,7 +19,6 @@
    const headers = req.headers;
    // 从本地存储中获取token值，然后后续所有的请求都会带 token 请求
    const {token} = storage.getItem('userInfo');
-   console.log(token)
    if (!headers.Authorization) headers.Authorization ='Bearer ' + token;
    return req;
  });
@@ -29,7 +28,8 @@
    const { code, data, msg } = res.data;
    if (code === 200) {
      return data;
-   } else if (code === 50001) {
+   } else if (code === 500001) {
+      console.log('111111')
      ElMessage.error(TOKEN_INVALID);
      setTimeout(() => {
        router.push("/login");
@@ -52,10 +52,8 @@
    if (options.method.toLowerCase() === "get") {
      options.params = options.data;
    }
-   console.log(options.url,'mock===>',options.mock)
    if(typeof options.mock != undefined){
     config.mock = options.mock
-    console.log(options.url,'mock===>',options.mock)
    }
    if (config.env === "prod") {
      service.defaults.baseURL = config.baseURL;

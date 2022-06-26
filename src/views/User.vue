@@ -1,5 +1,6 @@
 <script>
 import {onMounted,reactive,ref,getCurrentInstance,toRaw} from 'vue'
+import dayjs from 'dayjs'
 export default {
     name: "User",
     setup(){
@@ -32,9 +33,9 @@ export default {
                     }[value]
                 }
             },
-            {label:'注册时间',prop:"createTime"},
-            {label:'最后登录时间',prop:"lastLoginTime"},
-        ]);
+            {label:'注册时间',prop:"createTime",width:180,formatter:(row,column,value)=>{return dayjs(value).format('YYYY-MM-DD hh:mm:ss')}},
+            {label:'最后登录时间',prop:"lastLoginTime",width:180,formatter:(row,column,value)=>{return dayjs(value).format('YYYY-MM-DD hh:mm:ss')}},
+        ]); 
         const pager = reactive({
             pageNum:1,
             pageSize:10
