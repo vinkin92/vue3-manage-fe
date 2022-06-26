@@ -33,8 +33,8 @@ export default {
                     }[value]
                 }
             },
-            {label:'注册时间',prop:"createTime",width:180,formatter:(row,column,value)=>{return dayjs(value).format('YYYY-MM-DD hh:mm:ss')}},
-            {label:'最后登录时间',prop:"lastLoginTime",width:180,formatter:(row,column,value)=>{return dayjs(value).format('YYYY-MM-DD hh:mm:ss')}},
+            {label:'注册时间',prop:"createTime",formatter:(row,column,value)=>{return dayjs(value).format('YYYY-MM-DD hh:mm:ss')}},
+            {label:'最后登录时间',prop:"lastLoginTime",formatter:(row,column,value)=>{return dayjs(value).format('YYYY-MM-DD hh:mm:ss')}},
         ]); 
         const pager = reactive({
             pageNum:1,
