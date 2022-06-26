@@ -32,7 +32,7 @@
              url: '/users/list',
              method: 'get',
              data: params,
-             mack:true
+             mock:false
          })
      },
      userDel(params) {

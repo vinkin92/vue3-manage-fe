@@ -27,7 +27,7 @@ export default {
                 formatter(row,column,value){
                     return{
                         1:'在职',
-                        2:'普离职',
+                        2:'离职',
                         3:'试用期'
                     }[value]
                 }

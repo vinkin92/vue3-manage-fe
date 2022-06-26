@@ -19,7 +19,8 @@
    const headers = req.headers;
    // 从本地存储中获取token值，然后后续所有的请求都会带 token 请求
    const {token} = storage.getItem('userInfo');
-   if (!headers.Authorization) headers.Authorization = "Bear " + token;
+   console.log(token)
+   if (!headers.Authorization) headers.Authorization ='Bearer ' + token;
    return req;
  });
  
@@ -51,8 +52,10 @@
    if (options.method.toLowerCase() === "get") {
      options.params = options.data;
    }
-   if(typeof options.mock != 'undefined'){
+   console.log(options.url,'mock===>',options.mock)
+   if(typeof options.mock != undefined){
     config.mock = options.mock
+    console.log(options.url,'mock===>',options.mock)
    }
    if (config.env === "prod") {
      service.defaults.baseURL = config.baseURL;
