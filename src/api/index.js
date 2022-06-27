@@ -40,7 +40,7 @@
              url: '/users/delete',
              method: 'post',
              data: params,
-             mock:true
+             mock:false
          })
      },
      getRoleList() {

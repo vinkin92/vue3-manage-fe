@@ -68,6 +68,7 @@ export default {
         })
         const getUserList = async ()=>{
             let params = {...user,...pager};
+            console.log(params)
             try {
                 const {list,page} = await globalProperties.$api.getUserList(params);
                 userList.value = list;
@@ -92,6 +93,7 @@ export default {
         }
         // 用户单个删除
         const handleDel = async (row)=>{
+            console.log(row.userId)
             await globalProperties.$api.userDel({userIds:[row.userId]})
             globalProperties.$message.success('删除成功')
             getUserList()
@@ -100,7 +102,7 @@ export default {
         const handlePatchDel = async ()=>{
             if(checkdUserIds.value.length == 0) globalProperties.$message.error('请选择要删除的用户')
             const res = await globalProperties.$api.userDel({userIds:checkdUserIds.value})
-            if(res.nModified > 0){
+            if(res.modifiedCount > 0){
                 globalProperties.$message.success('删除成功')
                 getUserList()
             }else{
