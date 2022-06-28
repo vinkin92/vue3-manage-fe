@@ -68,7 +68,6 @@ export default {
         })
         const getUserList = async ()=>{
             let params = {...user,...pager};
-            console.log(params)
             try {
                 const {list,page} = await globalProperties.$api.getUserList(params);
                 userList.value = list;
@@ -84,7 +83,10 @@ export default {
         // 重置
         const handleReset = (formEl)=>{
             if(!formEl)return;
-            formEl.resetFields() 
+            ctx.$nextTick(()=>{
+                formEl.value.resetFields()
+            })
+            
         }
         //分页时间处理
         const handleCurrentChange = (val)=>{
@@ -93,7 +95,6 @@ export default {
         }
         // 用户单个删除
         const handleDel = async (row)=>{
-            console.log(row.userId)
             await globalProperties.$api.userDel({userIds:[row.userId]})
             globalProperties.$message.success('删除成功')
             getUserList()
@@ -130,6 +131,12 @@ export default {
             dialogVisible.value = false;
             handleReset(value)
         }
+        // 点击新增
+        const handleAdd = ()=>{
+            action.value = 'add';
+            dialogVisible.value = true;
+            handleReset(DialogForm)
+        }
         // 新增用户提交
         const handleSubmit = ()=>{
             // 先校验必填项是否填写
@@ -138,12 +145,12 @@ export default {
                     //toRaw 把响应式对象转换成普通对象，否则后面修改则会自动修改表单的内容
                     let params = toRaw(userForm);
                     params.userEmail += "@imooc.com";
+                    params.action = action.value;
                     let res = await globalProperties.$api.userSubmit(params)
-                    console.log('res',res)
                     if(res){
                         dialogVisible.value = false;
-                        ctx.$message.success('用户创建成功');
-                        handleReset('dialogForm');
+                        globalProperties.$message.success('用户创建成功');
+                        handleReset(DialogForm);
                         getUserList();
                     }
                     
@@ -162,7 +169,7 @@ export default {
         }
         return {user,userList,column,getUserList,pager,handleQuery,handleReset,formRef,handleCurrentChange,handleDel,checkdUserIds,handlePatchDel,
             handleSelectionChange,dialogVisible,userForm,rules,getDeptList,getRoleList,roleList,deptList,handleClose,handleSubmit,DialogForm,
-            handleEdit,action
+            handleEdit,action,handleAdd
         }
     }
 };
@@ -195,7 +202,7 @@ export default {
     <!--  用户列表 -->
     <div class="base-table">
         <div class="action">
-            <el-button type="primary" @click="action = 'add';dialogVisible = true">新增</el-button>
+            <el-button type="primary" @click="handleAdd">新增</el-button>
             <el-button type="danger" @click="handlePatchDel">批量删除</el-button>
         </div>
         <el-table :data="userList" @selection-change="handleSelectionChange">
